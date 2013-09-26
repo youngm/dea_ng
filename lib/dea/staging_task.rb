@@ -74,6 +74,7 @@ module Dea
     end
 
     def streaming_log_url
+      p @dir_server.staging_task_file_url_for(task_id, workspace.warden_staging_log)
       @dir_server.staging_task_file_url_for(task_id, workspace.warden_staging_log)
     end
 

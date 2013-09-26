@@ -47,7 +47,8 @@ module Dea
 
       hmac = hmac_helper.create(verifiable_path_and_params)
       params_with_hmac = params_to_s(params.merge(:hmac => hmac))
-
+      p "HOSTNAME************"
+      p external_hostname
       "#{@config["directory_server"]["protocol"]}://#{external_hostname}#{path}?#{params_with_hmac}"
     end
 

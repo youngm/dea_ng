@@ -41,11 +41,11 @@ RSpec.configure do |config|
   config.after(:all, :type => :integration, :requires_warden => true) { dea_stop if ENV.has_key?("LOCAL_DEA") }
 
   config.before(:all, :type => :integration) do
-    start_file_server
+    #start_file_server
   end
 
   config.after(:all, :type => :integration) do
-    stop_file_server
+    #stop_file_server
   end
 end
 
