@@ -128,6 +128,7 @@ describe "Staging an app", :type => :integration, :requires_warden => true do
     end
 
     it "does not crash" do
+      debugger
       response, _ = perform_stage_request(staging_message)
       expect(response["error"]).to include("Error uploading")
       expect(dea_memory).to be > 0
