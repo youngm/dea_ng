@@ -217,7 +217,8 @@ module Dea
     end
 
     def trap_usr1
-      exit
+      send_shutdown_message
+      ignore_signals
     end
 
     def trap_usr2
@@ -379,6 +380,7 @@ module Dea
       snapshot = {
         "time"      => start.to_f,
         "instances" => instances.map(&:snapshot_attributes),
+        "staging_tasks" => staging_task_registry.map(&:attributes)
       }
 
       file = Tempfile.new("instances", File.join(config["base_dir"], "tmp"))
@@ -627,7 +629,7 @@ module Dea
       end
     end
 
-    def shutdown(stop_instances = true)
+    def shutdown
       if @shutdown_processed
         logger.info("Shutdown already processed, doing nothing.")
         return
@@ -652,22 +654,20 @@ module Dea
       end
 
       pending_stops = Set.new([])
-      if stop_instances
-        pending_stops.merge(instance_registry.instances)
-        pending_stops.merge(staging_task_registry.tasks)
+      pending_stops.merge(instance_registry.instances)
+      pending_stops.merge(staging_task_registry.tasks)
 
-        pending_stops.each do |to_be_stopped|
-          to_be_stopped.stop do |error|
-            pending_stops.delete(to_be_stopped)
+      pending_stops.each do |to_be_stopped|
+        to_be_stopped.stop do |error|
+          pending_stops.delete(to_be_stopped)
 
-            if error
-              logger.warn("#{to_be_stopped} failed to stop: #{error}")
-            else
-              logger.debug("#{to_be_stopped} exited")
-            end
-
-            on_pending_empty.call if pending_stops.empty?
+          if error
+            logger.warn("#{to_be_stopped} failed to stop: #{error}")
+          else
+            logger.debug("#{to_be_stopped} exited")
           end
+
+          on_pending_empty.call if pending_stops.empty?
         end
       end
 
