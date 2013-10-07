@@ -367,16 +367,16 @@ module Dea
 
     def promise_unpack_buildpack_cache
       Promise.new do |p|
-        if File.exists?(workspace.downloaded_buildpack_cache_path)
-          logger.info("Unpacking buildpack cache to #{workspace.warden_cache}")
-
-          container.run_script(:app, <<-BASH)
-          package_size=`du -h #{workspace.downloaded_buildpack_cache_path} | cut -f1`
-          echo "-----> Downloaded app buildpack cache ($package_size)" >> #{workspace.warden_staging_log}
-          mkdir -p #{workspace.warden_cache}
-          tar xfz #{workspace.downloaded_buildpack_cache_path} -C #{workspace.warden_cache}
-          BASH
-        end
+        #if File.exists?(workspace.downloaded_buildpack_cache_path)
+        #  logger.info("Unpacking buildpack cache to #{workspace.warden_cache}")
+        #
+        #  container.run_script(:app, <<-BASH)
+        #  package_size=`du -h #{workspace.downloaded_buildpack_cache_path} | cut -f1`
+        #  echo "-----> Downloaded app buildpack cache ($package_size)" >> #{workspace.warden_staging_log}
+        #  mkdir -p #{workspace.warden_cache}
+        #  tar xfz #{workspace.downloaded_buildpack_cache_path} -C #{workspace.warden_cache}
+        #  BASH
+        #end
 
         p.deliver
       end

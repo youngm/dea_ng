@@ -338,6 +338,8 @@ module Dea
     end
 
     def start
+      load_snapshot
+
       start_component
       start_nats
       start_directory_server
@@ -345,6 +347,11 @@ module Dea
       register_directory_server_v2
       directory_server_v2.start
       setup_varz
+
+      unless instance_registry.empty?
+        logger.info("Loaded #{instance_registry.size} instances from snapshot")
+        send_heartbeat(instance_registry.to_a)
+      end
 
       start_finish
     end
@@ -381,6 +388,37 @@ module Dea
       FileUtils.mv(file.path, snapshot_path)
 
       logger.debug("Saving snapshot took: %.3fs" % [Time.now - start])
+    end
+
+    def load_snapshot
+      return unless File.exist?(snapshot_path)
+
+      start = Time.now
+
+      snapshot = ::Yajl::Parser.parse(File.read(snapshot_path))
+      snapshot ||= {}
+
+      if snapshot["instances"]
+        snapshot["instances"].each do |attributes|
+          instance_state = attributes.delete("state")
+          instance = create_instance(attributes)
+          next unless instance
+
+          # Ignore instance if it doesn't validate
+          begin
+            instance.validate
+          rescue => error
+            logger.warn("Error validating instance: #{error.message}")
+            next
+          end
+
+          # Enter instance state via "RESUMING" to trigger the right transitions
+          instance.state = Instance::State::RESUMING
+          instance.state = instance_state
+        end
+
+        logger.debug("Loading snapshot took: %.3fs" % [Time.now - start])
+      end
     end
 
     def reap_unreferenced_droplets
@@ -589,7 +627,7 @@ module Dea
       end
     end
 
-    def shutdown
+    def shutdown(stop_instances = true)
       if @shutdown_processed
         logger.info("Shutdown already processed, doing nothing.")
         return
@@ -614,20 +652,22 @@ module Dea
       end
 
       pending_stops = Set.new([])
-      pending_stops.merge(instance_registry.instances)
-      pending_stops.merge(staging_task_registry.tasks)
+      if stop_instances
+        pending_stops.merge(instance_registry.instances)
+        pending_stops.merge(staging_task_registry.tasks)
 
-      pending_stops.each do |to_be_stopped|
-        to_be_stopped.stop do |error|
-          pending_stops.delete(to_be_stopped)
+        pending_stops.each do |to_be_stopped|
+          to_be_stopped.stop do |error|
+            pending_stops.delete(to_be_stopped)
 
-          if error
-            logger.warn("#{to_be_stopped} failed to stop: #{error}")
-          else
-            logger.debug("#{to_be_stopped} exited")
+            if error
+              logger.warn("#{to_be_stopped} failed to stop: #{error}")
+            else
+              logger.debug("#{to_be_stopped} exited")
+            end
+
+            on_pending_empty.call if pending_stops.empty?
           end
-
-          on_pending_empty.call if pending_stops.empty?
         end
       end
 
