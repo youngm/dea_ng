@@ -51,11 +51,11 @@ RSpec.configure do |config|
   config.before(:all, :type => :integration) do
     WebMock.disable!
 
-    start_file_server
+    start_file_server if ENV.has_key?("LOCAL_DEA")
   end
 
   config.after(:all, :type => :integration) do
-    stop_file_server
+    stop_file_server if ENV.has_key?("LOCAL_DEA")
   end
 end
 

@@ -1,0 +1,36 @@
+#!/bin/bash -e
+
+RUN_DIR=/var/vcap/sys/run/fake_file_server
+LOG_DIR=/var/vcap/sys/log/fake_file_server
+PIDFILE=$RUN_DIR/fake_file_server.pid
+JOB_DIR=/var/vcap/jobs/fake_file_server
+
+source /var/vcap/packages/common/utils.sh
+
+case $1 in
+
+  start)
+    pid_guard $PIDFILE "fake_file_server"
+
+    mkdir -p $RUN_DIR
+    mkdir -p $LOG_DIR
+
+    echo $$ > $PIDFILE
+
+    exec /var/vcap/packages/ruby/bin/ruby /var/vcap/packages/fake_file_server/spec/bin/file_server.rb 10119 \
+         >>$LOG_DIR/fake_file_server.stdout.log \
+         2>>$LOG_DIR/fake_file_server.stderr.log
+
+    ;;
+
+  stop)
+    kill_and_wait $PIDFILE
+
+    ;;
+
+  *)
+    echo "Usage: fake_file_server_ctl {start|stop}"
+
+    ;;
+
+esac

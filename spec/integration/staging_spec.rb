@@ -9,6 +9,7 @@ describe "Staging an app", :type => :integration, :requires_warden => true do
   let(:staged_url) { "http://#{file_server_address}/staged/sinatra" }
   let(:buildpack_cache_download_uri) { "http://#{file_server_address}/buildpack_cache" }
   let(:buildpack_cache_upload_uri) { "http://#{file_server_address}/buildpack_cache" }
+  let(:staged_buildpack_cache_download_uri) { "http://#{file_server_address}/staged_buildpack_cache" }
   let(:app_id) { "some-app-id" }
   let(:properties) { {} }
   let(:task_id) { SecureRandom.uuid }
@@ -179,8 +180,7 @@ describe "Staging an app", :type => :integration, :requires_warden => true do
     let(:properties) { {"buildpack" => buildpack_url, "environment" => env, "resources" => limits} }
 
     it "works" do
-      buildpack_cache_file = File.join(FILE_SERVER_DIR, "buildpack_cache.tgz")
-      FileUtils.rm_rf(buildpack_cache_file)
+      fake_file_server.remove_buildpack_cache
 
       response, staging_log = perform_stage_request(staging_message)
 
@@ -191,7 +191,7 @@ describe "Staging an app", :type => :integration, :requires_warden => true do
       end
 
       and_by "uploading buildpack cache after staging" do
-        expect(File.exist?(buildpack_cache_file)).to be_true
+        expect(fake_file_server).to have_buildpack_cache
       end
 
       and_by "downloading buildpack cache before staging" do
@@ -206,8 +206,7 @@ describe "Staging an app", :type => :integration, :requires_warden => true do
       and_by "cleaning the buildpack cache between staging" do
         Dir.mktmpdir do |tmp|
           Dir.chdir(tmp) do
-            buildpack_cache_file = File.join(FILE_SERVER_DIR, "buildpack_cache.tgz")
-            `tar -zxf #{buildpack_cache_file}`
+            `curl -s #{staged_buildpack_cache_download_uri} | tar xfz -`
             expect(File.exist?("new_cached_file")).to be_true
             expect(File.exist?("cached_file")).to_not be_true
           end

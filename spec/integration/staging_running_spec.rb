@@ -45,11 +45,7 @@ describe "Running an app immediately after staging", :type => :integration, :req
     }
   end
 
-  let(:uploaded_droplet) { File.join(FILE_SERVER_DIR, "sinatra") }
-
-  before do
-    FileUtils.rm_rf(uploaded_droplet)
-  end
+  before { fake_file_server.remove_droplet("sinatra") }
 
   it "works" do
     by "staging the app" do
@@ -70,7 +66,7 @@ describe "Running an app immediately after staging", :type => :integration, :req
     end
 
     and_by "uploading the droplet" do
-      expect(File.exist?(uploaded_droplet)).to be_true
+      expect(fake_file_server).to have_droplet("sinatra")
     end
   end
 end

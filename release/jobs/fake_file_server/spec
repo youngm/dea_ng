@@ -1,0 +1,9 @@
+---
+name: fake_file_server
+templates:
+  fake_file_server_ctl: bin/fake_file_server_ctl
+
+packages:
+- common
+- ruby
+- fake_file_server

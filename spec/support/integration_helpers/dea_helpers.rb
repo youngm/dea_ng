@@ -4,6 +4,7 @@ require "shellwords"
 
 require_relative "process_helpers"
 require_relative "local_ip_finder"
+require_relative "deployed_job"
 
 require "dea/config"
 
@@ -56,7 +57,7 @@ module DeaHelpers
   end
 
   def evacuate_dea
-    dea_server.evacuate_dea
+    dea_server.evacuate
     sleep evacuation_delay
   end
 
@@ -75,9 +76,7 @@ module DeaHelpers
   end
 
   def file_server_address
-    local_ip = LocalIPFinder.new.find
-
-    "#{local_ip.ip_address}:10197"
+    "#{fake_file_server.host}:10197"
   end
 
   def dea_start
@@ -140,8 +139,22 @@ module DeaHelpers
     JSON.parse(dea_server.instance_file)
   end
 
+  def fake_file_server
+    @fake_file_server ||=
+      if ENV["LOCAL_DEA"]
+        LocalFileServer.new
+      else
+        RemoteFileServer.new
+      end
+  end
+
   def dea_server
-    @dea_server ||= ENV["LOCAL_DEA"] ? LocalDea.new : RemoteDea.new
+    @dea_server ||=
+      if ENV["LOCAL_DEA"]
+        LocalDea.new
+      else
+        RemoteDea.new
+      end
   end
 
   def dea_config
@@ -152,7 +165,7 @@ module DeaHelpers
     include ProcessHelpers
 
     def host
-      config["domain"]
+      LocalIPFinder.new.find
     end
 
     def start
@@ -187,17 +200,14 @@ module DeaHelpers
       File.read File.join(config["base_dir"], "db", "instances.json")
     end
 
-    def evacuate_dea
+    def evacuate
       stop
     end
   end
 
-  class RemoteDea
-    INTEGRATION_CONFIG_FILE =
-        File.expand_path("../../../integration/config.yml", __FILE__)
-
+  class RemoteDea < DeployedJob
     def host
-      integration_config["host"]
+      "10.244.0.6"
     end
 
     def start
@@ -212,7 +222,7 @@ module DeaHelpers
       remote_exec("cat #{config["pid_filename"]}").to_i
     end
 
-    def evacuate_dea
+    def evacuate
       remote_exec("kill -USR2 #{pid}")
     end
 
@@ -226,47 +236,61 @@ module DeaHelpers
         Dea::Config.new(config_yaml).tap(&:validate)
       end
     end
+  end
 
-    def remote_file(path)
-      remote_exec("cat #{path}")
+  class LocalFileServer
+    def host
+      LocalIPFinder.new.find
     end
 
-    def directory_entries(path)
-      remote_exec("ruby -e \"puts Dir.entries('#{path}')\"").split("\n")
+    def has_droplet?(name)
+      File.exists?(file_path(name))
     end
 
-    def integration_config
-      @integration_config ||= YAML.load_file(INTEGRATION_CONFIG_FILE)
+    def remove_droplet(name)
+      FileUtils.rm_f(file_path(name))
     end
 
-    def remote_exec(cmd)
-      host = integration_config["host"]
-      username = integration_config["username"]
-      password = integration_config["password"]
+    def has_buildpack_cache?
+      File.exists?(file_path("buildpack_cache.tgz"))
+    end
 
-      Net::SSH.start(host, username, :password => password) do |ssh|
-        result = ""
+    def remove_buildpack_cache
+      FileUtils.rm_f(file_path("buildpack_cache.tgz"))
+    end
 
-        ssh.open_channel do |ch|
-          ch.request_pty do |ch, success|
-            raise "could not open pty" unless success
+    private
 
-            ch.exec("sudo bash -ic #{Shellwords.escape(cmd)}")
+    def file_path(name)
+      File.join(FILE_SERVER_DIR, name)
+    end
+  end
 
-            ch.on_data do |_, data|
-              if data =~ /^\[sudo\] password for #{username}:/
-                ch.send_data("#{password}\n")
-              else
-                result << data
-              end
-            end
-          end
-        end
+  class RemoteFileServer < DeployedJob
+    def host
+      "10.244.0.10"
+    end
 
-        ssh.loop
+    def has_droplet?(name)
+      file_exists?(file_path(name))
+    end
 
-        return result
-      end
+    def remove_droplet(name)
+      remote_exec("rm #{file_path(name)}")
+    end
+
+    def has_buildpack_cache?
+      file_exists?(file_path("buildpack_cache.tgz"))
+    end
+
+    def remove_buildpack_cache
+      remote_exec("rm #{file_path("buildpack_cache.tgz")}")
+    end
+
+    private
+
+    def file_path(name)
+      File.join(FILE_SERVER_DIR, name)
     end
   end
 end

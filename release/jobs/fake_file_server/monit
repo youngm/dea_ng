@@ -1,0 +1,5 @@
+check process fake_file_server
+  with pidfile /var/vcap/sys/run/fake_file_server/fake_file_server.pid
+  start program "/var/vcap/jobs/fake_file_server/bin/fake_file_server_ctl start"
+  stop program "/var/vcap/jobs/fake_file_server/bin/fake_file_server_ctl stop"
+  group vcap

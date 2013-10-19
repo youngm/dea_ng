@@ -1,5 +1,10 @@
 #!/usr/bin/env ruby
 
+ENV['BUNDLE_GEMFILE'] ||= File.expand_path('../../../Gemfile', __FILE__)
+
+require 'rubygems'
+require 'bundler/setup'
+
 require "fileutils"
 require "thin"
 require "sinatra/base"
@@ -50,6 +55,10 @@ class FileServer < Sinatra::Base
     droplet = params["upload"]["droplet"]
     FileUtils.mv(droplet[:tempfile].path, file_path("buildpack_cache.tgz"))
     200
+  end
+
+  get "/staged_buildpack_cache" do
+    send_file(file_path("buildpack_cache.tgz"))
   end
 
   get "/admin_buildpacks/:name" do |name|

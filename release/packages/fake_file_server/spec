@@ -1,0 +1,9 @@
+---
+name: fake_file_server
+dependencies:
+- ruby
+files:
+- dea_next/Gemfile
+- dea_next/Gemfile.lock
+- dea_next/spec/**/*
+- dea_next/buildpacks/**/*

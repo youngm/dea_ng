@@ -1,32 +1,6 @@
 networks: (( merge ))
 
 jobs:
-  - name: nats
-    release: cf
-    template: nats
-    instances: 1
-    resource_pool: runner
-    networks:
-      - name: cf1
-        static_ips: (( static_ips(0) ))
-    properties:
-      networks:
-        apps: cf1
-        management: cf1
-
-  - name: router
-    release: cf
-    template: gorouter
-    instances: 1
-    resource_pool: runner
-    networks:
-      - name: cf1
-        static_ips: (( static_ips(5) ))
-    properties:
-      networks:
-        apps: cf1
-        management: cf1
-
   - name: runner
     release: dea
     template:
@@ -36,10 +10,34 @@ jobs:
     networks:
       - name: cf1
         static_ips: (( static_ips(1) ))
-    properties:
-      networks:
-        apps: cf1
-        management: cf1
+
+  - name: fake_file_server
+    release: dea
+    template:
+      - fake_file_server
+    instances: 1
+    resource_pool: runner
+    networks:
+      - name: cf1
+        static_ips: (( static_ips(2) ))
+
+  - name: nats
+    release: cf
+    template: nats
+    instances: 1
+    resource_pool: runner
+    networks:
+      - name: cf1
+        static_ips: (( static_ips(0) ))
+
+  - name: router
+    release: cf
+    template: gorouter
+    instances: 1
+    resource_pool: runner
+    networks:
+      - name: cf1
+        static_ips: (( static_ips(5) ))
 
 properties:
   domain: (( jobs.router.networks.cf1.static_ips.[0] ".xip.io" ))
@@ -60,3 +58,7 @@ properties:
     kernel_network_tuning_enabled: false
     directory_server_protocol: http
     evacuation_delay: 10
+
+  networks:
+    apps: cf1
+    management: cf1
