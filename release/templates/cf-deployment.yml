@@ -1,0 +1,45 @@
+meta:
+  # override this in your stub to set the environment name,
+  # which is used for the deployment name
+  #
+  # i.e. cf-tabasco
+  environment: ~
+
+  stemcell:
+    name: bosh-stemcell
+    version: latest
+
+name: (( meta.environment ))
+
+director_uuid: (( merge ))
+
+releases:
+  - name: cf
+    version: latest
+  - name: dea
+    version: latest
+
+networks: (( merge ))
+
+jobs: (( merge ))
+
+properties: (( merge ))
+
+compilation:
+  workers: 6
+  network: cf1
+  reuse_compilation_vms: true
+  cloud_properties: (( merge ))
+
+update:
+  canaries: 0
+  max_in_flight: 100
+  canary_watch_time: 30000-600000
+  update_watch_time: 5000-600000
+
+resource_pools:
+  - name: runner
+    network: cf1
+    size: (( auto ))
+    stemcell: (( meta.stemcell ))
+    cloud_properties: (( merge ))

@@ -16,3 +16,6 @@
 [submodule "go/src/github.com/howeyc/fsnotify"]
 	path = go/src/github.com/howeyc/fsnotify
 	url = https://github.com/howeyc/fsnotify.git
+[submodule "release/src/warden"]
+	path = release/src/warden
+	url = https://github.com/cloudfoundry/warden.git

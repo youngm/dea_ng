@@ -1,0 +1,62 @@
+networks: (( merge ))
+
+jobs:
+  - name: nats
+    release: cf
+    template: nats
+    instances: 1
+    resource_pool: runner
+    networks:
+      - name: cf1
+        static_ips: (( static_ips(0) ))
+    properties:
+      networks:
+        apps: cf1
+        management: cf1
+
+  - name: router
+    release: cf
+    template: gorouter
+    instances: 1
+    resource_pool: runner
+    networks:
+      - name: cf1
+        static_ips: (( static_ips(5) ))
+    properties:
+      networks:
+        apps: cf1
+        management: cf1
+
+  - name: runner
+    release: dea
+    template:
+      - dea_next
+    instances: 1
+    resource_pool: runner
+    networks:
+      - name: cf1
+        static_ips: (( static_ips(1) ))
+    properties:
+      networks:
+        apps: cf1
+        management: cf1
+
+properties:
+  domain: (( jobs.router.networks.cf1.static_ips.[0] ".xip.io" ))
+
+  disk_quota_enabled: false
+
+  nats:
+    user: nats
+    password: nats
+    address: (( jobs.nats.networks.cf1.static_ips.[0] ))
+    port: 4222
+
+  dea_next:
+    memory_mb: 4196
+    memory_overcommit_factor: 2
+    disk_mb: 4196
+    disk_overcommit_factor: 2
+    kernel_network_tuning_enabled: false
+    directory_server_protocol: http
+    evacuation_delay: 10

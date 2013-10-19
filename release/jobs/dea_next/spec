@@ -1,0 +1,78 @@
+---
+name: dea_next
+templates:
+  dea.yml.erb: config/dea.yml
+  dea_ctl: bin/dea_ctl
+  drain.erb: bin/drain
+  syslog_forwarder.conf.erb: config/syslog_forwarder.conf
+
+  warden_ctl: bin/warden_ctl
+  warden.yml.erb: config/warden.yml
+
+  dir_server_ctl: bin/dir_server_ctl
+
+packages:
+- common
+- dea_next
+- warden
+- rootfs_lucid64
+- ruby
+- golang
+- syslog_aggregator
+- buildpack_cache
+properties:
+  domain:
+    description: "DNS domain name for this Cloud Foundry deployment"
+  nats.address:
+    description: "IP address of NATS server"
+  nats.password:
+    description: "password for NATS login"
+  nats.port:
+    description: "TCP port of NATS server"
+  nats.user:
+    description: "user name for NATS login"
+  dea_next.allow_networks:
+    description: 
+  dea_next.deny_networks:
+    description:
+  dea_next.disk_mb:
+    description:
+    default: 32000
+  dea_next.disk_overcommit_factor:
+    description:
+    default: 1
+  dea_next.max_staging_duration:
+    description:
+    default: 900
+  dea_next.memory_mb:
+    description:
+    default: 8000
+  dea_next.memory_overcommit_factor:
+    description:
+    default: 1
+  dea_next.stacks:
+    default:
+    - "lucid64"
+    description:
+  dea_next.streaming_timeout:
+    description:
+    default: 60
+  dea_next.directory_server_protocol:
+    description: 'The protocol to use when communicating with the directory server ("http" or "https")'
+    default: 'https'
+  dea_next.kernel_network_tuning_enabled:
+    description: "with latest kernel version, no kernel network tunings allowed with in warden cpi containers"
+    default: true
+  dea_next.mtu:
+    description: "Interface MTU size"
+    default: 1500
+  dea_next.evacuation_delay:
+    description: "Duration to wait before shutting down, in seconds."
+    default: 115
+  disk_quota_enabled:
+    description: "disk quota must be disabled to use warden-inside-warden with the warden cpi"
+    default: true
+  syslog_aggregator:
+    description: "Syslog aggregator stuff"
+  loggregator.trafficcontroller:
+    description: The url used to emit messages to the Loggregator

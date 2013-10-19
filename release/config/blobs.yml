@@ -1,0 +1,37 @@
+---
+golang/go1.1.2.linux-amd64-yacc-shaved.tar.gz:
+  object_id: 12274b09-fe06-4990-a2fe-1b6e04616009
+  sha: !binary |-
+    MDJhYTlmNDdiOTVjZTAxMmI1NzAyZGFmNDFkM2ZmNGI3ODFhYzMwZQ==
+  size: 41768327
+ruby/ruby-1.9.3-p448.tar.gz:
+  object_id: 37208aad-5274-4364-8590-c8516bc57a1b
+  sha: !binary |-
+    YzdmNzM2ZTNiYzFjYTFlNjYxOWE5MTIxODM3ZGQwODQwYWFkNzdjZQ==
+  size: 12559260
+ruby/rubygems-1.8.24.tgz:
+  object_id: rest/objects/4e4e78bca41e122204e4e9863d076304fa1cc28797a9
+  sha: 30f27047e74f7943117736a0d3e224994fee0905
+  size: 380101
+ruby/bundler-1.2.1.gem:
+  object_id: rest/objects/4e4e78bca31e121204e4e86ee39692050a16252f052f
+  sha: 0cbe6ad7a41f064d6c11c1058465fffb1bd58069
+  size: 226816
+libyaml/yaml-0.1.4.tgz:
+  object_id: rest/objects/4e4e78bca51e122004e4e8ec6840770511d35ffc91bd
+  sha: e0e5e09192ab10a607e3da2970db492118f560f2
+  size: 471759
+git/git-1.7.11.2.tar.gz:
+  object_id: rest/objects/4e4e78bca61e121204e4e86eebe59104fff12d7e49c6
+  sha: f67b4f6c0277250411c6872ae7b8a872ae11d313
+  size: 4015780
+buildpack_cache/ruby-1.8.7.tgz:
+  object_id: 0eb2f5a8-a840-4cda-a71c-d2d61ab5e8de
+  sha: !binary |-
+    YjI4ODY5YjA2NTc1YjM3ZDM3MGUzZTg1ZGRlMDQ0ZjJlYWNhNzJkMw==
+  size: 4436501
+rootfs/lucid64.tar.gz:
+  object_id: rest/objects/4e4e78bca61e122204e4e98643d9ae051782c701f072
+  sha: !binary |-
+    YjI2MzNiMmFiNDk2NGY5MTQwMmJiMmQ4ODlmMmYxMjQ0OWE4YjgyOA==
+  size: 199489185

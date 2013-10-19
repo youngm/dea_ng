@@ -1,0 +1,9 @@
+---
+name: warden
+dependencies:
+- ruby
+files:
+- warden/warden/{bin,config,lib,root,src}/**/*
+- warden/warden/Gemfile
+- warden/warden/Gemfile.lock
+- warden/warden/Rakefile

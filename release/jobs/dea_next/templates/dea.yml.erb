@@ -1,0 +1,62 @@
+---
+nats_uri: nats://<%= p("nats.user") %>:<%= p("nats.password") %>@<%= p("nats.address") %>:<%= p("nats.port") %>
+
+dea_ruby: /usr/bin/ruby
+
+pid_filename: /var/vcap/sys/run/dea_next/dea_next.pid
+
+base_dir: /var/vcap/data/dea_next
+
+warden_socket: /var/vcap/data/warden/warden.sock
+
+evacuation_delay_secs: <%= p("dea_next.evacuation_delay") %>
+
+directory_server:
+  protocol: '<%= p('dea_next.directory_server_protocol') %>'
+  v1_port: 12345
+  v2_port: 34567
+  file_api_port: 23456
+  streaming_timeout: <% p("dea_next.streaming_timeout") %>
+  logging:
+    file: /var/vcap/sys/log/dea_next/dir_server.log
+    <% if_p("syslog_aggregator") do %>
+    syslog: vcap.directory_server
+    <% end %>
+    level: debug
+
+domain: <%= p("domain") %>
+
+logging:
+  file: /var/vcap/sys/log/dea_next/dea_next.log
+  level: debug
+  <% if_p("syslog_aggregator.address") do %>
+  syslog: vcap.dea_next
+  <% end %>
+
+<% if_p("loggregator.trafficcontroller") do |trafficcontroller| %>
+loggregator:
+  router: <%= trafficcontroller %>
+<% end %>
+
+index: <%= spec.index %>
+
+intervals:
+  heartbeat: 10
+  advertise: 5
+
+resources:
+  memory_mb: <%= p("dea_next.memory_mb") %>
+  memory_overcommit_factor: <%= p("dea_next.memory_overcommit_factor") %>
+  disk_mb: <%= p("dea_next.disk_mb") %>
+  disk_overcommit_factor: <%= p("dea_next.disk_overcommit_factor") %>
+
+bind_mounts:
+- src_path: /var/vcap/packages/buildpack_cache
+
+staging:
+  enabled: true
+  max_staging_duration: <%= p("dea_next.max_staging_duration") %>
+  environment:
+    BUILDPACK_CACHE: "/var/vcap/packages/buildpack_cache"
+
+stacks: <%= p("dea_next.stacks") %>
