@@ -35,3 +35,8 @@ rootfs/lucid64.tar.gz:
   sha: !binary |-
     YjI2MzNiMmFiNDk2NGY5MTQwMmJiMmQ4ODlmMmYxMjQ0OWE4YjgyOA==
   size: 199489185
+loggregator/deaagent-linux-amd64.gz:
+  object_id: 7861a5c2-bb68-430c-9260-cd201d75e0ec
+  sha: !binary |-
+    ZjFiYTUzOTIyMjcyZjE1M2M5MThmZDY2MzViY2QxNjhmYWYxODY5ZA==
+  size: 1663548
