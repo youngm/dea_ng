@@ -1,6 +1,15 @@
 networks: (( merge ))
 
 jobs:
+  - name: nats
+    release: cf
+    template: nats
+    instances: 1
+    resource_pool: runner
+    networks:
+      - name: cf1
+        static_ips: (( static_ips(0) ))
+
   - name: runner
     release: dea
     template:
@@ -20,15 +29,6 @@ jobs:
     networks:
       - name: cf1
         static_ips: (( static_ips(2) ))
-
-  - name: nats
-    release: cf
-    template: nats
-    instances: 1
-    resource_pool: runner
-    networks:
-      - name: cf1
-        static_ips: (( static_ips(0) ))
 
   - name: router
     release: cf
