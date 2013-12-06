@@ -71,6 +71,7 @@ module Dea
     def setup
       validate_config
 
+      setup_nats
       setup_logging
       setup_loggregator
       setup_droplet_registry
@@ -79,14 +80,12 @@ module Dea
       setup_instance_manager
       setup_snapshot
       setup_resource_manager
+      setup_router_client
       setup_directory_server
       setup_directory_server_v2
-      setup_signal_handlers
       setup_directories
       setup_pid_file
       setup_sweepers
-      setup_nats
-      setup_router_client
     end
 
     def setup_varz
@@ -183,7 +182,7 @@ module Dea
 ### SIG_Handlers
 
     def setup_signal_handlers
-      @sig_handler ||= SignalHandler.new(uuid, local_ip, nats, locator_responders, instance_registry, @staging_task_registry, droplet_registry, @directory_server, logger, config)
+      @sig_handler ||= SignalHandler.new(uuid, local_ip, nats, locator_responders, instance_registry, @staging_task_registry, droplet_registry, @directory_server_v2, logger, config)
       @sig_handler.setup do |signal, &handler|
         ::Kernel.trap(signal, &handler)
       end
@@ -309,6 +308,7 @@ module Dea
       directory_server_v2.start
       setup_varz
 
+      setup_signal_handlers
       start_finish
     end
 

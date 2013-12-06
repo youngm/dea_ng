@@ -62,7 +62,7 @@ module DeaHelpers
   end
 
   def stop_file_server
-    graceful_kill(@file_server_pid) if @file_server_pid
+    merciless_kill(@file_server_pid) if @file_server_pid
   end
 
   def file_server_address
