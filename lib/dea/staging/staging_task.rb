@@ -11,7 +11,6 @@ require "dea/env"
 require "dea/staging/admin_buildpack_downloader"
 require "dea/staging/staging_task_workspace"
 require "dea/staging/staging_message"
-require "dea/loggregator"
 
 module Dea
   class StagingTask < Task
@@ -205,7 +204,7 @@ module Dea
         logger.debug "staging.task.execute-staging", script: script
 
         Timeout.timeout(staging_timeout + staging_timeout_grace_period) do
-          loggregator_emit_result container.run_script(:app, script)
+          container.run_script(:app, script, false, true, staging_message.app_id)
         end
 
         p.deliver
@@ -238,7 +237,7 @@ module Dea
       Promise.new do |p|
         logger.info "staging.task.unpacking-app", destination: workspace.warden_unstaged_dir
 
-        loggregator_emit_result container.run_script(:app, <<-BASH)
+        container.run_script(:app, <<-BASH, false, true, staging_message.app_id)
           set -o pipefail
           package_size=`du -h #{workspace.downloaded_app_package_path} | cut -f1`
           echo "-----> Downloaded app package ($package_size)" | tee -a #{workspace.warden_staging_log}
@@ -291,7 +290,7 @@ module Dea
 
     def promise_log_upload_started
       Promise.new do |p|
-        loggregator_emit_result container.run_script(:app, <<-BASH)
+        container.run_script(:app, <<-BASH, false, true, staging_message.app_id)
           set -o pipefail
           droplet_size=`du -h #{workspace.warden_staged_droplet} | cut -f1`
           echo "-----> Uploading droplet ($droplet_size)" | tee -a #{workspace.warden_staging_log}
@@ -448,7 +447,7 @@ module Dea
           logger.info "staging.buildpack-cache.unpack",
             destination: workspace.warden_cache
 
-          loggregator_emit_result container.run_script(:app, <<-BASH)
+          container.run_script(:app, <<-BASH, false, true, staging_message.app_id)
           set -o pipefail
           package_size=`du -h #{workspace.downloaded_buildpack_cache_path} | cut -f1`
           echo "-----> Downloaded app buildpack cache ($package_size)" | tee -a #{workspace.warden_staging_log}
@@ -547,14 +546,6 @@ module Dea
 
     def staging_timeout_grace_period
       60
-    end
-
-    def loggregator_emit_result(result)
-      if (result != nil)
-        Dea::Loggregator.staging_emit(staging_message.app_id, result.stdout)
-        Dea::Loggregator.staging_emit_error(staging_message.app_id, result.stderr)
-      end
-      result
     end
   end
 end

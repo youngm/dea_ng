@@ -775,7 +775,7 @@ describe Dea::Instance do
           ).and_return(generator)
 
           instance.container.should_receive(:spawn)
-            .with(script, instance.file_descriptor_limit, Dea::Instance::NPROC_LIMIT, true)
+            .with(script, instance.file_descriptor_limit, Dea::Instance::NPROC_LIMIT, true, instance.application_id)
             .and_return(response)
 
           instance.promise_start.resolve
@@ -802,9 +802,7 @@ describe Dea::Instance do
               env.exported_system_environment_variables
             ).and_return(generator)
 
-            instance.container.should_receive(:spawn)
-              .with(script, instance.file_descriptor_limit, Dea::Instance::NPROC_LIMIT, true)
-              .and_return(response)
+            instance.container.should_receive(:spawn).and_return(response)
 
             instance.promise_start.resolve
           end

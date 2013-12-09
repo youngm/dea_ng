@@ -89,15 +89,10 @@ describe Dea::StagingTask do
       staging.promise_stage.resolve
     end
 
-    it "logs to the loggregator" do
-      @emitter.reset
-      staging.container.should_receive(:run_script).and_return(double(:stdout => "stdout message", :stderr => "stderr message"))
+    it "runs script with application id log tag" do
+      staging.container.should_receive(:run_script).
+        with(:app, anything, false, true, staging.staging_message.app_id)
       staging.promise_stage.resolve
-      app_id = staging.staging_message.app_id
-      expect(@emitter.messages.size).to eql(1)
-      expect(@emitter.error_messages.size).to eql(1)
-      expect(@emitter.messages[app_id][0]).to eql("stdout message")
-      expect(@emitter.error_messages[app_id][0]).to eql("stderr message")
     end
 
     context "when env variables need to be escaped" do
@@ -779,15 +774,25 @@ YAML
       staging.promise_unpack_app.resolve
     end
 
-    it "logs to loggregator" do
-      @emitter.reset
-      staging.container.should_receive(:run_script).and_return(double(:stdout => "stdout message", :stderr => "stderr message"))
+    it "runs script with application id log tag" do
+      staging.container.should_receive(:run_script).with(:app, anything, false, true, staging.staging_message.app_id)
       staging.promise_unpack_app.resolve
-      app_id = staging.staging_message.app_id
-      expect(@emitter.messages.size).to eql(1)
-      expect(@emitter.error_messages.size).to eql(1)
-      expect(@emitter.messages[app_id][0]).to eql("stdout message")
-      expect(@emitter.error_messages[app_id][0]).to eql("stderr message")
+    end
+  end
+
+  describe "#promise_log_upload_started" do
+    it "assembles a shell command" do
+      staging.container.should_receive(:run_script) do |connection_name, cmd|
+        cmd.should include("droplet_size=\`du -h /tmp/droplet.tgz | cut -f1\`")
+
+        empty_streams
+      end
+      staging.promise_log_upload_started.resolve
+    end
+
+    it "runs script with application id log tag" do
+      staging.container.should_receive(:run_script).with(:app, anything, false, true, staging.staging_message.app_id)
+      staging.promise_log_upload_started.resolve
     end
   end
 
@@ -813,15 +818,9 @@ YAML
         staging.promise_unpack_buildpack_cache.resolve
       end
 
-      it "logs to loggregator" do
-        @emitter.reset
-        staging.container.should_receive(:run_script).and_return(double(:stdout => "stdout message", :stderr => "stderr message"))
+      it "runs script with application id log tag" do
+        staging.container.should_receive(:run_script).with(:app, anything, false, true, staging.staging_message.app_id)
         staging.promise_unpack_buildpack_cache.resolve
-        app_id = staging.staging_message.app_id
-        expect(@emitter.messages.size).to eql(1)
-        expect(@emitter.error_messages.size).to eql(1)
-        expect(@emitter.messages[app_id][0]).to eql("stdout message")
-        expect(@emitter.error_messages[app_id][0]).to eql("stderr message")
       end
     end
   end
