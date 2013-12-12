@@ -8,11 +8,6 @@ require "dea/directory_server/directory_server_v2"
 require "dea/staging/staging_task"
 
 describe Dea::StagingTask do
-  before(:all) do
-    @emitter = FakeEmitter.new
-    Dea::Loggregator.staging_emitter = @emitter
-  end
-
   let(:memory_limit_mb) { 256 }
   let(:disk_limit_mb) { 1025 }
 
