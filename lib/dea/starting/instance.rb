@@ -413,7 +413,7 @@ module Dea
           start_script = env.exported_environment_variables + "./startup;\nexit"
         end
 
-        response = container.spawn(start_script, self.file_descriptor_limit, NPROC_LIMIT, true, application_id)
+        response = container.spawn(start_script, self.file_descriptor_limit, NPROC_LIMIT, true, app_log_tag)
 
         attributes["warden_job_id"] = response.job_id
 
@@ -891,6 +891,10 @@ module Dea
       }
 
       @logger ||= self.class.logger.tag(tags)
+    end
+
+    def app_log_tag
+      "APP.#{application_id}"
     end
   end
 end

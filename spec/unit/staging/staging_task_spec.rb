@@ -84,9 +84,9 @@ describe Dea::StagingTask do
       staging.promise_stage.resolve
     end
 
-    it "runs script with application id log tag" do
+    it "runs script with application id and staging log tag" do
       staging.container.should_receive(:run_script).
-        with(:app, anything, false, true, staging.staging_message.app_id)
+        with(:app, anything, false, true, "STG.#{staging.staging_message.app_id}")
       staging.promise_stage.resolve
     end
 
@@ -770,7 +770,8 @@ YAML
     end
 
     it "runs script with application id log tag" do
-      staging.container.should_receive(:run_script).with(:app, anything, false, true, staging.staging_message.app_id)
+      staging.container.should_receive(:run_script).with(
+          :app, anything, false, true, "STG.#{staging.staging_message.app_id}")
       staging.promise_unpack_app.resolve
     end
   end
@@ -786,7 +787,8 @@ YAML
     end
 
     it "runs script with application id log tag" do
-      staging.container.should_receive(:run_script).with(:app, anything, false, true, staging.staging_message.app_id)
+      staging.container.should_receive(:run_script).with(
+          :app, anything, false, true, "STG.#{staging.staging_message.app_id}")
       staging.promise_log_upload_started.resolve
     end
   end
@@ -814,7 +816,8 @@ YAML
       end
 
       it "runs script with application id log tag" do
-        staging.container.should_receive(:run_script).with(:app, anything, false, true, staging.staging_message.app_id)
+        staging.container.should_receive(:run_script).with(
+            :app, anything, false, true, "STG.#{staging.staging_message.app_id}")
         staging.promise_unpack_buildpack_cache.resolve
       end
     end

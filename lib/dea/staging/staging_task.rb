@@ -204,7 +204,7 @@ module Dea
         logger.debug "staging.task.execute-staging", script: script
 
         Timeout.timeout(staging_timeout + staging_timeout_grace_period) do
-          container.run_script(:app, script, false, true, staging_message.app_id)
+          container.run_script(:app, script, false, true, staging_log_tag)
         end
 
         p.deliver
@@ -237,7 +237,7 @@ module Dea
       Promise.new do |p|
         logger.info "staging.task.unpacking-app", destination: workspace.warden_unstaged_dir
 
-        container.run_script(:app, <<-BASH, false, true, staging_message.app_id)
+        container.run_script(:app, <<-BASH, false, true, staging_log_tag)
           set -o pipefail
           package_size=`du -h #{workspace.downloaded_app_package_path} | cut -f1`
           echo "-----> Downloaded app package ($package_size)" | tee -a #{workspace.warden_staging_log}
@@ -290,7 +290,7 @@ module Dea
 
     def promise_log_upload_started
       Promise.new do |p|
-        container.run_script(:app, <<-BASH, false, true, staging_message.app_id)
+        container.run_script(:app, <<-BASH, false, true, staging_log_tag)
           set -o pipefail
           droplet_size=`du -h #{workspace.warden_staged_droplet} | cut -f1`
           echo "-----> Uploading droplet ($droplet_size)" | tee -a #{workspace.warden_staging_log}
@@ -447,7 +447,7 @@ module Dea
           logger.info "staging.buildpack-cache.unpack",
             destination: workspace.warden_cache
 
-          container.run_script(:app, <<-BASH, false, true, staging_message.app_id)
+          container.run_script(:app, <<-BASH, false, true, staging_log_tag)
           set -o pipefail
           package_size=`du -h #{workspace.downloaded_buildpack_cache_path} | cut -f1`
           echo "-----> Downloaded app buildpack cache ($package_size)" | tee -a #{workspace.warden_staging_log}
@@ -546,6 +546,10 @@ module Dea
 
     def staging_timeout_grace_period
       60
+    end
+
+    def staging_log_tag
+      "STG.#{staging_message.app_id}"
     end
   end
 end
