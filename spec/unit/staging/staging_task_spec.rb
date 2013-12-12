@@ -77,7 +77,7 @@ describe Dea::StagingTask do
         expect(cmd).to include %Q{export MEMORY_LIMIT="512m";} # the user assiged 512 should overwrite the system 256
         expect(cmd).to include %Q{export VCAP_SERVICES="}
 
-        expect(cmd).to match %r{.*/bin/run .*/plugin_config | tee -a}
+        expect(cmd).to match %r{.*/bin/run .*/plugin_config 1> .* 2>}
 
         empty_streams
       end

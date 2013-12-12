@@ -198,7 +198,8 @@ module Dea
           config["dea_ruby"],
           run_plugin_path,
           workspace.plugin_config_path,
-          "| tee -a #{workspace.warden_staging_log}"
+          "1> >( tee -a #{workspace.warden_staging_log}) >&1",
+          "2> >( tee -a #{workspace.warden_staging_log}) >&2"
         ].join(" ")
 
         logger.debug "staging.task.execute-staging", script: script
