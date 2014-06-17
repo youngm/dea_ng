@@ -4,7 +4,10 @@ class NonBlockingUnzipper
     File.chmod(mode, tmp_dir)
     EM.system "unzip -q #{file} -d #{tmp_dir}" do |output, status|
       if status.exitstatus == 0
-        FileUtils.mv(tmp_dir, dest_dir)
+        begin
+          FileUtils.mv(tmp_dir, dest_dir)
+        rescue => e
+        end
       else
         tmp_dir.unlink
       end
