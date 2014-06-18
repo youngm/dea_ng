@@ -63,7 +63,7 @@ class StagingMessage
   end
 
   def egress_rules
-    @message["egress_network_rules"]
+    @message["egress_network_rules"] || []
   end
 
   private

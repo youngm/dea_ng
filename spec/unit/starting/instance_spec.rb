@@ -125,6 +125,29 @@ describe Dea::Instance do
       end
     end
 
+    describe 'egress network rules' do
+      context 'when egress network rules are missing' do
+        let(:start_message_data) { {} }
+
+        its(:egress_network_rules) { should eq([]) }
+      end
+
+      context 'when egress network rules are present' do
+        let (:start_message_data) do
+          {
+            'egress_network_rules' => [
+              { 'protocol' => 'tcp' },
+              { 'port_range' => '80-443' }
+            ]
+          }
+        end
+
+        its(:egress_network_rules) do
+          should match_array([{ 'protocol' => 'tcp' },{ 'port_range' => '80-443' }])
+        end
+      end
+    end
+
     describe 'other attributes' do
       let(:start_message_data) do
         {

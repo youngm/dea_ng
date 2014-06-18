@@ -126,11 +126,9 @@ class Container
   end
 
   def setup_egress_rules(rules)
-    logger.info "++++++++++++++++++++++++++++++ADDING EGRESS RULES #{rules.inspect}"
+    logger.debug("setting up egress rules: #{rules}")
     ::EgressRulesMapper.new(rules, handle).map_to_warden_rules.each do |request|
-      logger.info("+++++++++++++ EGRESS RULE #{request.inspect}")
       response = call(:app, request)
-      logger.info "++++++++++++++++++++++NET OUT RESPONSE #{response.inspect}"
     end
   end
 

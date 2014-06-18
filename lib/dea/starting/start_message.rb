@@ -88,7 +88,7 @@ class StartMessage
   end
 
   def egress_network_rules
-    message["egress_network_rules"]
+    message["egress_network_rules"] || []
   end
 
   def message

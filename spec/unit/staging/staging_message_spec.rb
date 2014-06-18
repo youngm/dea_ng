@@ -31,6 +31,7 @@ describe StagingMessage do
 
   let(:admin_buildpacks) { [] }
   let(:properties) { {"some_property" => "some_value"} }
+  let(:egress_network_rules) { [{ 'json' => 'data' }] }
 
   let(:staging_message) do
     {
@@ -43,7 +44,7 @@ describe StagingMessage do
       "buildpack_cache_upload_uri" => "http://localhost/buildpack_cache/upload",
       "admin_buildpacks" => admin_buildpacks,
       "start_message" => start_message,
-      "egress_network_rules" => [{ 'json' => 'data' }],
+      "egress_network_rules" => egress_network_rules,
     }
   end
 
@@ -137,5 +138,10 @@ describe StagingMessage do
     let(:properties) { {"buildpack_key" => "admin_buildpack_key"} }
 
     its(:buildpack_key) { should eq "admin_buildpack_key" }
+  end
+
+  context "when egress rules are not specified" do
+    let(:egress_network_rules) { nil }
+    its(:egress_rules) { should eq([]) }
   end
 end

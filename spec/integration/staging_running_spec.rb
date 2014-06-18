@@ -29,7 +29,7 @@ describe "Running an app immediately after staging", :type => :integration, :req
         "fds" => 32
       },
       "services" => [],
-      "egress_network_rules" => "[]", # grrrr - shouldn't be a string
+      "egress_network_rules" => [],
     }
   end
 
@@ -42,8 +42,8 @@ describe "Running an app immediately after staging", :type => :integration, :req
       "upload_uri" => staged_url,
       "buildpack_cache_upload_uri" => buildpack_cache_upload_uri,
       "buildpack_cache_download_uri" => buildpack_cache_download_uri,
-      "egress_network_rules" => "[]", # grrrr - shouldn't be a string
-      "start_message" => start_message
+      "egress_network_rules" => [],
+      "start_message" => start_message,
     }
   end
 
