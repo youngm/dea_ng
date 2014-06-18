@@ -27,6 +27,7 @@ describe StartMessage do
       "start_command" => "rails s -s $PORT",
       "index" => 1,
       "vcap_application" => "message vcap_application",
+      "egress_network_rules" => "egress network rules",
     }
   end
 
@@ -53,6 +54,7 @@ describe StartMessage do
   its(:start_command) { should eq "rails s -s $PORT" }
   its(:vcap_application) { should eq "message vcap_application" }
   its(:to_hash) { should eq start_message }
+  its(:egress_network_rules) { should eq("egress network rules") }
 
   context "when there is no limits" do
     before { start_message.delete("limits") }
@@ -132,5 +134,6 @@ describe StartMessage do
     its(:start_command) { should be_nil }
     its(:to_hash) { should eq({})}
     its(:vcap_application) { should eq({})}
+    its(:egress_network_rules) { should be_nil }
   end
 end

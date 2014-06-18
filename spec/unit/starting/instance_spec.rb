@@ -632,7 +632,8 @@ describe Dea::Instance do
                  byte: instance.disk_limit_in_bytes,
                  inode: instance.config.instance_disk_inode_limit,
                  limit_memory: instance.memory_limit_in_bytes,
-                 setup_network: with_network)
+                 setup_inbound_network: with_network,
+                 egress_rules: instance.egress_rules)
         expect_start.to_not raise_error
         instance.exit_description.should be_empty
       end

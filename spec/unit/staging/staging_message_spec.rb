@@ -24,7 +24,8 @@ describe StagingMessage do
       "debug" => nil,
       "start_command" =>
         nil,
-      "index" => 0
+      "index" => 0,
+      "egress_network_rules" => nil,
     }
   end
 
@@ -42,6 +43,7 @@ describe StagingMessage do
       "buildpack_cache_upload_uri" => "http://localhost/buildpack_cache/upload",
       "admin_buildpacks" => admin_buildpacks,
       "start_message" => start_message,
+      "egress_network_rules" => [{ 'json' => 'data' }],
     }
   end
 
@@ -58,6 +60,7 @@ describe StagingMessage do
   its(:properties) { should eq({"some_property" => "some_value"}) }
   its(:buildpack_git_url) { should be_nil }
   its(:buildpack_key) { should be_nil }
+  its(:egress_rules) { should eq([{ 'json' => 'data' }]) }
   its(:to_hash) { should eq staging_message }
 
   it "should memoize the start message" do
